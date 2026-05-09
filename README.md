@@ -1,4 +1,4 @@
-# webe — personal portfolio
+# Portfolio
 
 My personal portfolio website showcasing projects and work.
 
