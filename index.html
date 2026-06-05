@@ -1,695 +1,505 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>_webe — Portfolio</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
-  <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>_webe · Portfolio</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --bg: #050506;
+    --bg-2: #0c0c0e;
+    --card: rgba(255,255,255,0.035);
+    --card-hover: rgba(255,255,255,0.06);
+    --border: rgba(255,255,255,0.09);
+    --border-strong: rgba(255,255,255,0.18);
+    --text: #f5f5f7;
+    --text-dim: #a1a1a6;
+    --text-mute: #6e6e73;
+    --white: #ffffff;
+    --sans: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Segoe UI", system-ui, sans-serif;
+    --mono: "JetBrains Mono", ui-monospace, "SF Mono", monospace;
+    --maxw: 1080px;
+    --r-lg: 30px;
+    --r-md: 22px;
+    --r-sm: 16px;
+    --ease: cubic-bezier(0.22, 1, 0.36, 1);
+  }
 
-    :root {
-      --light: #F8F8F8;
-      --dark: #191919;
-      --white: #ffffff;
-      --card-bg: rgba(255,255,255,0.07);
-      --card-border: rgba(255,255,255,0.12);
-      --btn-gradient: linear-gradient(135deg, #ffffff 0%, #F3F4F6 100%);
-    }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--sans);
+    font-size: 17px;
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+    overflow-x: hidden;
+  }
+  ::selection { background: var(--white); color: #000; }
+  a { color: inherit; text-decoration: none; }
+  .wrap { max-width: var(--maxw); margin: 0 auto; padding: 0 28px; }
+  .mono { font-family: var(--mono); }
 
-    html { scroll-behavior: smooth; }
+  .ambient {
+    position: fixed; inset: 0; z-index: 0; pointer-events: none;
+    background:
+      radial-gradient(720px 480px at 50% -8%, rgba(255,255,255,0.07), transparent 70%),
+      radial-gradient(600px 600px at 88% 12%, rgba(255,255,255,0.03), transparent 66%);
+  }
 
-    body {
-      font-family: 'Inter', sans-serif;
-      background: var(--light);
-      color: var(--dark);
-      overflow-x: hidden;
-    }
+  nav {
+    position: fixed; top: 16px; left: 50%; transform: translateX(-50%);
+    z-index: 50; width: calc(100% - 32px); max-width: 940px;
+  }
+  .nav-inner {
+    display: flex; align-items: center; justify-content: space-between;
+    height: 54px; padding: 0 10px 0 20px;
+    background: rgba(20,20,22,0.6);
+    backdrop-filter: blur(20px) saturate(160%);
+    -webkit-backdrop-filter: blur(20px) saturate(160%);
+    border: 1px solid var(--border);
+    border-radius: 980px;
+    box-shadow: 0 8px 30px -12px rgba(0,0,0,0.6);
+  }
+  .brand { font-weight: 600; font-size: 16px; letter-spacing: -0.01em; display: flex; align-items: center; gap: 9px; }
+  .brand .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--white); box-shadow: 0 0 10px rgba(255,255,255,0.6); }
+  .nav-links { display: flex; align-items: center; gap: 2px; }
+  .nav-links a {
+    font-size: 14px; color: var(--text-dim); padding: 8px 14px; border-radius: 980px;
+    transition: color 0.25s var(--ease), background 0.25s var(--ease);
+  }
+  .nav-links a:hover { color: var(--text); background: rgba(255,255,255,0.06); }
+  .nav-links a.cta { background: var(--white); color: #000; font-weight: 500; }
+  .nav-links a.cta:hover { background: var(--text-dim); }
+  @media (max-width: 640px) { .nav-links a.hide-sm { display: none; } }
 
-    /* ─── HERO ─── */
-    #hero {
-      position: relative;
-      width: 100%;
-      height: 100vh;
-      height: 100svh;
-      background: var(--light);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      text-align: center;
-      padding: 0 24px;
-    }
+  .reveal { opacity: 0; transform: translateY(20px); transition: opacity 0.8s var(--ease), transform 0.8s var(--ease); }
+  .reveal.in { opacity: 1; transform: none; }
 
-    .hero-name {
-      font-size: clamp(72px, 11vw, 140px);
-      font-weight: 800;
-      letter-spacing: -0.04em;
-      line-height: 1;
-      color: var(--dark);
-    }
+  header.hero { position: relative; z-index: 1; padding: 180px 0 110px; text-align: center; }
+  .pill-tag {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-size: 13px; color: var(--text-dim);
+    border: 1px solid var(--border); border-radius: 980px; padding: 7px 15px;
+    background: var(--card); margin-bottom: 32px;
+  }
+  .pill-tag .live { width: 7px; height: 7px; border-radius: 50%; background: var(--white); box-shadow: 0 0 8px rgba(255,255,255,0.6); }
+  .hero h1 {
+    font-size: clamp(56px, 11vw, 128px); font-weight: 600; line-height: 0.95;
+    letter-spacing: -0.045em; margin-bottom: 28px; color: var(--text);
+  }
+  .hero h1 .u { color: var(--text-mute); }
+  .hero-lede {
+    font-size: clamp(20px, 2.6vw, 28px); max-width: 660px; margin: 0 auto;
+    color: var(--text-dim); line-height: 1.4; font-weight: 400; letter-spacing: -0.01em;
+  }
+  .hero-lede b { color: var(--text); font-weight: 500; }
+  .hero-cta { margin-top: 40px; display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+  .btn {
+    display: inline-flex; align-items: center; gap: 9px; font-size: 15px; font-weight: 500;
+    padding: 13px 24px; border-radius: 980px; transition: all 0.3s var(--ease);
+  }
+  .btn-primary { background: var(--white); color: #000; }
+  .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 14px 36px -12px rgba(255,255,255,0.4); }
+  .btn-ghost { border: 1px solid var(--border-strong); color: var(--text); background: var(--card); }
+  .btn-ghost:hover { background: var(--card-hover); transform: translateY(-2px); }
+  .btn .arr { transition: transform 0.3s var(--ease); }
+  .btn:hover .arr { transform: translateX(3px); }
 
-    .arrow-down {
-      position: absolute;
-      bottom: 110px;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 52px;
-      height: 62px;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      animation: bob 2.6s ease-in-out infinite;
-      text-decoration: none;
-      -webkit-tap-highlight-color: transparent;
-    }
+  section { position: relative; z-index: 1; padding: 70px 0; }
+  .sec-head { display: flex; align-items: center; gap: 14px; margin-bottom: 40px; }
+  .sec-num { font-family: var(--mono); font-size: 12px; color: var(--text-mute); border: 1px solid var(--border); border-radius: 980px; padding: 4px 11px; }
+  .sec-title { font-size: 15px; color: var(--text-dim); letter-spacing: 0.02em; font-weight: 500; }
 
-    .arrow-down svg {
-      width: 52px;
-      height: 62px;
-      fill: none;
-      transition: opacity 0.2s;
-    }
+  .label { font-size: 12px; color: var(--text-mute); letter-spacing: 0.06em; text-transform: uppercase; margin-bottom: 14px; font-weight: 500; }
 
-    .arrow-down:hover svg { opacity: 0.6; }
+  .card {
+    background: var(--card); border: 1px solid var(--border); border-radius: var(--r-md);
+    background-image: linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0));
+  }
 
-    @keyframes bob {
-      0%, 100% { transform: translateX(-50%) translateY(0); }
-      50%       { transform: translateX(-50%) translateY(11px); }
-    }
+  .about-grid { display: grid; grid-template-columns: 1.15fr 0.85fr; gap: 20px; align-items: stretch; }
+  @media (max-width: 820px) { .about-grid { grid-template-columns: 1fr; } }
+  .about-text { padding: 38px 38px 40px; }
+  .about-text p { font-size: 19px; color: var(--text-dim); line-height: 1.6; }
+  .about-text p + p { margin-top: 18px; }
+  .about-text p b { color: var(--text); font-weight: 500; }
+  .glance { padding: 34px 32px; display: flex; flex-direction: column; gap: 22px; }
+  .glance .label { margin-bottom: 10px; }
+  .chips { display: flex; flex-wrap: wrap; gap: 9px; }
+  .chip {
+    font-size: 13.5px; color: var(--text-dim);
+    border: 1px solid var(--border); border-radius: 980px; padding: 8px 15px;
+    transition: all 0.26s var(--ease); cursor: default; background: rgba(255,255,255,0.02);
+  }
+  .chip:hover { color: var(--text); border-color: var(--border-strong); transform: translateY(-2px); }
+  .chip.key { color: #000; background: var(--white); border-color: var(--white); }
 
-    /* ─── DARK ─── */
-    #dark {
-      background: var(--dark);
-      padding-bottom: 80px;
-    }
+  .stack-card { padding: 38px 36px; display: flex; flex-direction: column; gap: 26px; }
+  .stack-row .label { margin-bottom: 12px; }
 
-    /* ─── NAV ─── */
-    nav {
-      position: sticky;
-      top: 0;
-      z-index: 100;
-      width: 100%;
-      display: flex;
-      justify-content: center;
-      padding: 20px 24px;
-    }
+  .projects { display: grid; gap: 16px; }
+  .project {
+    display: grid; grid-template-columns: 1fr auto; gap: 24px; align-items: center;
+    padding: 30px 32px; border-radius: var(--r-md);
+    background: var(--card); border: 1px solid var(--border);
+    transition: transform 0.4s var(--ease), border-color 0.4s var(--ease), background-color 0.4s var(--ease);
+  }
+  .project:hover { transform: translateY(-4px); border-color: var(--border-strong); background-color: var(--card-hover); }
+  .p-main { min-width: 0; }
+  .p-top { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 9px; }
+  .p-name { font-size: 27px; font-weight: 600; letter-spacing: -0.02em; }
+  .p-badge { font-size: 11.5px; padding: 4px 11px; border-radius: 980px; letter-spacing: 0.02em; font-weight: 500; }
+  .p-badge.wip { color: var(--text); background: rgba(255,255,255,0.1); border: 1px solid var(--border); }
+  .p-badge.live { color: #34d399; background: rgba(52,211,153,0.12); }
+  .p-desc { color: var(--text-dim); font-size: 16px; line-height: 1.5; max-width: 580px; }
+  .p-tags { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 16px; }
+  .p-tag { font-family: var(--mono); font-size: 11.5px; color: var(--text-mute); border: 1px solid var(--border); border-radius: 7px; padding: 3px 9px; }
+  .p-link {
+    font-size: 14px; color: var(--text); white-space: nowrap;
+    display: inline-flex; align-items: center; gap: 8px;
+    border: 1px solid var(--border-strong); border-radius: 980px; padding: 11px 20px;
+    transition: all 0.28s var(--ease); background: var(--card);
+  }
+  .p-link:hover { background: var(--white); color: #000; border-color: var(--white); }
+  .p-link .arr { transition: transform 0.28s var(--ease); }
+  .p-link:hover .arr { transform: translate(2px,-2px); }
+  @media (max-width: 680px) { .project { grid-template-columns: 1fr; } .p-link { justify-self: start; } }
+  .more-row { display: flex; align-items: center; gap: 14px; margin-top: 22px; font-size: 13px; color: var(--text-mute); }
+  .more-row .line { flex: 1; height: 1px; background: var(--border); }
 
-    .nav-inner {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      background: rgba(255,255,255,0.07);
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
-      border: 1px solid rgba(255,255,255,0.12);
-      border-radius: 9999px;
-      padding: 8px 8px 8px 18px;
-    }
+  .gh-head { display: flex; align-items: center; gap: 10px; margin-left: auto; }
+  .gh-live { display: inline-flex; align-items: center; gap: 7px; font-size: 12px; color: var(--text-mute); font-family: var(--mono); }
+  .gh-live .d { width: 6px; height: 6px; border-radius: 50%; background: var(--text-mute); transition: background 0.3s; }
+  .gh-live.on .d { background: #34d399; box-shadow: 0 0 8px #34d399; }
+  .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+  @media (max-width: 680px) { .stats { grid-template-columns: repeat(2, 1fr); } }
+  .stat { padding: 30px 26px; border-radius: var(--r-md); background: var(--card); border: 1px solid var(--border); background-image: linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0)); transition: transform 0.35s var(--ease), border-color 0.35s; }
+  .stat:hover { transform: translateY(-3px); border-color: var(--border-strong); }
+  .stat .num { font-size: 48px; font-weight: 600; letter-spacing: -0.03em; line-height: 1; font-variant-numeric: tabular-nums; }
+  .stat .num.skeleton { color: var(--text-mute); }
+  .stat .lbl { font-size: 13px; color: var(--text-mute); margin-top: 12px; }
+  .contrib { margin-top: 16px; padding: 28px 30px; border-radius: var(--r-md); background: var(--card); border: 1px solid var(--border); background-image: linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0)); }
+  .contrib-top { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 20px; flex-wrap: wrap; }
+  .contrib-top .t { font-size: 14px; color: var(--text-dim); }
+  .contrib-top .t b { color: var(--text); font-weight: 600; }
+  .legend { display: flex; align-items: center; gap: 6px; font-size: 11px; color: var(--text-mute); }
+  .lg { width: 11px; height: 11px; border-radius: 3px; }
+  .heat { display: grid; grid-template-rows: repeat(7, 1fr); grid-auto-flow: column; grid-auto-columns: 1fr; gap: 3px; min-height: 112px; }
+  .cell { aspect-ratio: 1; border-radius: 3px; background: #1f2630; transition: background 0.5s var(--ease); }
+  @media (max-width: 680px) {
+    .contrib { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+    .heat { grid-template-rows: repeat(7, 11px); grid-auto-columns: 11px; min-height: 0; width: max-content; }
+    .cell { aspect-ratio: auto; width: 11px; height: 11px; }
+  }
+  .cell.l1 { background: #1a7a40; }
+  .cell.l2 { background: #2ea043; }
+  .cell.l3 { background: #4ac76a; }
+  .cell.l4 { background: #6df58e; }
+  .gh-note { font-size: 12px; color: var(--text-mute); margin-top: 14px; font-family: var(--mono); }
 
-    .nav-logo {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      color: var(--white);
-      text-decoration: none;
-      font-size: 14px;
-      font-weight: 700;
-      letter-spacing: -0.02em;
-      margin-right: 8px;
-    }
+  .contact-card { padding: 64px 40px 56px; text-align: center; border-radius: var(--r-lg); }
+  .contact-card h2 { font-size: clamp(40px, 7vw, 78px); font-weight: 600; letter-spacing: -0.04em; line-height: 1; margin-bottom: 22px; }
+  .contact-card h2 .u { color: var(--text-mute); }
+  .contact-sub { color: var(--text-dim); font-size: 19px; max-width: 480px; margin: 0 auto 34px; }
+  .socials { display: flex; flex-wrap: wrap; gap: 12px; justify-content: center; }
+  .social { font-size: 14px; color: var(--text); border: 1px solid var(--border-strong); border-radius: 980px; padding: 12px 22px; display: inline-flex; align-items: center; gap: 8px; transition: all 0.28s var(--ease); background: var(--card); }
+  .social:hover { background: var(--white); color: #000; border-color: var(--white); transform: translateY(-2px); }
+  .social.primary { background: var(--white); color: #000; border-color: var(--white); }
+  .social.primary:hover { background: var(--text-dim); }
 
-    .nav-logo svg {
-      width: 15px; height: 15px;
-      stroke: rgba(255,255,255,0.7);
-      fill: none;
-      stroke-width: 1.6;
-      stroke-linecap: round;
-      stroke-linejoin: round;
-    }
-
-    .nav-sep {
-      width: 4px; height: 4px;
-      border-radius: 50%;
-      background: rgba(255,255,255,0.25);
-      margin: 0 3px;
-    }
-
-    .nav-link {
-      color: rgba(255,255,255,0.6);
-      text-decoration: none;
-      font-size: 13px;
-      font-weight: 500;
-      padding: 6px 12px;
-      border-radius: 9999px;
-      transition: color 0.2s, background 0.2s;
-    }
-
-    .nav-link:hover {
-      color: var(--white);
-      background: rgba(255,255,255,0.08);
-    }
-
-    .nav-link.btn {
-      background: var(--btn-gradient);
-      color: #030712;
-      padding: 7px 16px;
-      font-weight: 600;
-      transition: opacity 0.2s;
-    }
-
-    .nav-link.btn:hover { opacity: 0.85; }
-
-    /* ─── DIVIDER ─── */
-    .divider {
-      width: 100%;
-      height: 1px;
-      margin: 64px 0;
-      background: linear-gradient(90deg, transparent 0%, rgba(255,239,239,0.75) 50%, transparent 100%);
-    }
-
-    /* ─── PROJECTS ─── */
-    #projects {
-      max-width: 980px;
-      margin: 56px auto 0;
-      padding: 0 24px;
-    }
-
-    .section-label {
-      font-size: 11px;
-      font-weight: 600;
-      letter-spacing: 0.22em;
-      text-transform: uppercase;
-      color: rgba(255,255,255,0.28);
-      margin-bottom: 28px;
-    }
-
-    /* card — relative + overflow hidden so the image doesn't overflow */
-    .project-card {
-      position: relative;
-      overflow: hidden;
-      background: var(--card-bg);
-      border: 1px solid var(--card-border);
-      border-radius: 22px;
-      padding: 40px 44px;
-      margin-bottom: 20px;
-      min-height: 300px;
-      transition: border-color 0.25s, background 0.25s;
-    }
-
-    .project-card:hover {
-      background: rgba(255,255,255,0.095);
-      border-color: rgba(255,255,255,0.19);
-    }
-
-    /* text occupies the left side, doesn't overlap the photo */
-    .project-content {
-      position: relative;
-      z-index: 1;
-      max-width: 520px;
-    }
-
-    .project-meta {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      margin-bottom: 14px;
-    }
-
-    .lang-badge {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      font-size: 12px;
-      font-weight: 500;
-      color: rgba(255,255,255,0.4);
-    }
-
-    .lang-dot {
-      width: 8px; height: 8px;
-      border-radius: 50%;
-      flex-shrink: 0;
-    }
-
-    .lang-dot.html  { background: #e34c26; }
-    .lang-dot.shell { background: #89e051; }
-
-    .star-badge {
-      display: flex;
-      align-items: center;
-      gap: 5px;
-      font-size: 12px;
-      color: rgba(255,255,255,0.32);
-    }
-
-    .star-badge svg {
-      width: 12px; height: 12px;
-      fill: rgba(255,255,255,0.32);
-    }
-
-    .license-badge {
-      font-size: 12px;
-      font-weight: 500;
-      color: rgba(255,255,255,0.32);
-    }
-
-    /* ── skeleton loader ── */
-    @keyframes shimmer {
-      0%   { background-position: -200% center; }
-      100% { background-position:  200% center; }
-    }
-
-    .skeleton {
-      display: inline-block;
-      height: 12px;
-      border-radius: 6px;
-      background: linear-gradient(
-        90deg,
-        rgba(255,255,255,0.07) 25%,
-        rgba(255,255,255,0.18) 50%,
-        rgba(255,255,255,0.07) 75%
-      );
-      background-size: 200% 100%;
-      animation: shimmer 1.4s ease-in-out infinite;
-      vertical-align: middle;
-    }
-
-    .skeleton-dot {
-      width: 8px;
-      height: 8px;
-      border-radius: 50%;
-    }
-
-    .skeleton-text {
-      width: 48px;
-    }
-
-    .skeleton-num {
-      width: 18px;
-    }
-
-    .project-title {
-      font-size: clamp(22px, 3vw, 30px);
-      font-weight: 700;
-      color: var(--white);
-      letter-spacing: -0.025em;
-      margin-bottom: 12px;
-    }
-
-    .project-desc {
-      font-size: 15px;
-      line-height: 1.65;
-      color: rgba(255,255,255,0.42);
-      margin-bottom: 24px;
-    }
-
-    .project-tags {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 7px;
-      margin-bottom: 28px;
-    }
-
-    .tag {
-      font-size: 12px;
-      font-weight: 500;
-      color: rgba(255,255,255,0.45);
-      background: rgba(255,255,255,0.055);
-      border: 1px solid rgba(255,255,255,0.09);
-      border-radius: 6px;
-      padding: 4px 10px;
-    }
-
-    .project-btn {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      background: var(--btn-gradient);
-      color: #030712;
-      font-size: 14px;
-      font-weight: 600;
-      padding: 11px 20px;
-      border-radius: 12px;
-      text-decoration: none;
-      transition: opacity 0.2s, transform 0.15s;
-    }
-
-    .project-btn:hover { opacity: 0.87; transform: translateY(-1px); }
-
-    .project-btn svg {
-      width: 13px; height: 13px;
-      stroke: #030712;
-      fill: none;
-      stroke-width: 2;
-      stroke-linecap: round;
-      stroke-linejoin: round;
-    }
-
-    /* photo — absolute, bottom-right corner, clipped by card's overflow:hidden */
-    .project-img {
-      position: absolute;
-      bottom: 0;
-      right: 0;
-    }
-
-    .project-img img {
-      display: block;
-      max-height: 100%;
-      border-radius: 0 0 21px 0;
-    }
-
-    /* landscape (Arasaka) */
-    .project-img.landscape img {
-      width: 340px;
-      height: auto;
-      border-radius: 12px;
-    }
-
-    /* portrait (Termux) */
-    .project-img.portrait img {
-      height: 300px;
-      width: auto;
-    }
-
-    /* limit home card text width so it doesn't overlap the screenshot */
-    .card-home .project-content {
-      max-width: 430px;
-    }
-
-    /* ─── FOOTER ─── */
-    footer {
-      max-width: 980px;
-      margin: 0 auto;
-      padding: 48px 24px 32px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 16px;
-    }
-
-    .footer-left {
-      font-size: 13px;
-      color: rgba(255,255,255,0.28);
-    }
-
-    .footer-links {
-      display: flex;
-      gap: 16px;
-    }
-
-    .footer-links a {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      font-size: 13px;
-      color: rgba(255,255,255,0.32);
-      text-decoration: none;
-      transition: color 0.2s;
-    }
-
-    .footer-links a:hover { color: rgba(255,255,255,0.72); }
-
-    .footer-links svg {
-      width: 15px; height: 15px;
-      stroke: currentColor;
-      fill: none;
-      stroke-width: 1.6;
-      stroke-linecap: round;
-      stroke-linejoin: round;
-    }
-
-    /* ─── SCROLL APPEAR ─── */
-    .project-card {
-      opacity: 0;
-      transform: translateY(32px);
-      transition: opacity 0.6s ease, transform 0.6s ease;
-    }
-
-    .project-card.visible {
-      opacity: 1;
-      transform: translateY(0);
-    }
-
-    /* ─── RESPONSIVE ─── */
-    @media (max-width: 700px) {
-      .project-card { padding: 32px 28px; min-height: 0; }
-      .project-img  { display: none; }
-      nav .nav-sep  { display: none; }
-      nav .nav-link:not(.btn):not(.nav-logo) { display: none; }
-      footer { flex-direction: column; text-align: center; }
-    }
-
-    @media (max-width: 480px) {
-      .nav-inner { padding: 7px; gap: 3px; }
-      .nav-logo  { margin-right: 4px; }
-    }
-  </style>
+  footer { position: relative; z-index: 1; margin-top: 70px; padding: 32px 0 40px; }
+  .foot-inner { display: flex; align-items: center; justify-content: space-between; font-size: 13px; color: var(--text-mute); flex-wrap: wrap; gap: 10px; }
+  .foot-inner a { color: var(--text-dim); transition: color 0.2s var(--ease); }
+  .foot-inner a:hover { color: var(--text); }
+</style>
 </head>
 <body>
+  <div class="ambient"></div>
 
-  <!-- ─── HERO ─── -->
-  <section id="hero">
-    <h1 class="hero-name">_webe</h1>
+  <nav>
+    <div class="nav-inner">
+      <a href="#top" class="brand"><span class="dot"></span>_webe</a>
+      <div class="nav-links">
+        <a href="#about" class="hide-sm">About</a>
+        <a href="#projects" class="hide-sm">Work</a>
+        <a href="#github" class="hide-sm">Activity</a>
+        <a href="https://github.com/webe132" class="cta" target="_blank" rel="noopener">GitHub</a>
+      </div>
+    </div>
+  </nav>
 
-    <a class="arrow-down" href="#dark" aria-label="Scroll down">
-      <!-- viewBox with 10px padding for round caps; chevron — single path, tip has true linejoin -->
-      <svg viewBox="0 0 120 140" aria-hidden="true">
-        <!-- chevron: single path → tip gets stroke-linejoin="round" -->
-        <path d="M10,82 L60,132 L110,82"
-              stroke="#191919" stroke-width="16"
-              stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-        <!-- stem -->
-        <path d="M60,8 L60,132"
-              stroke="#191919" stroke-width="16"
-              stroke-linecap="round" fill="none"/>
-      </svg>
-    </a>
+  <a id="top"></a>
+  <header class="hero">
+    <div class="wrap">
+      <div class="pill-tag reveal"><span class="live"></span>Available for collaboration</div>
+      <h1 class="reveal"><span class="u">_</span>webe</h1>
+      <p class="hero-lede reveal">Developer with ~1 year shipping, from full-stack web apps to terminal tooling. Currently building my own <b>fork of Prism Launcher</b>.</p>
+      <div class="hero-cta reveal">
+        <a href="#projects" class="btn btn-primary">View work <span class="arr">→</span></a>
+        <a href="https://github.com/webe132" target="_blank" rel="noopener" class="btn btn-ghost">GitHub ↗</a>
+      </div>
+    </div>
+  </header>
+
+  <section id="about">
+    <div class="wrap">
+      <div class="sec-head reveal"><span class="sec-num">01</span><span class="sec-title">About</span></div>
+      <div class="about-grid">
+        <div class="card about-text reveal">
+          <p>I'm a developer with around <b>one year</b> of hands-on experience. I've authored <b>three websites</b> (one with a full, working <b>backend</b>), alongside smaller open-source tools like <b>FancyTermux</b>.</p>
+          <p>Most of my focus now goes into my own <b>fork of Prism Launcher</b>, where I'm digging deeper into C++/Qt and desktop tooling.</p>
+          <p>I like clean structure, fast iteration, and software that does one thing well.</p>
+        </div>
+        <div class="card glance reveal">
+          <div class="stack-row">
+            <div class="label">At a glance</div>
+            <div class="chips">
+              <span class="chip key">microcoder</span>
+              <span class="chip">1 yr exp</span>
+              <span class="chip">3 websites shipped</span>
+              <span class="chip">1 full backend</span>
+              <span class="chip">open source</span>
+            </div>
+          </div>
+          <div class="stack-row">
+            <div class="label">Currently</div>
+            <div class="chips">
+              <span class="chip key">Prism Launcher fork</span>
+              <span class="chip">C++ / Qt</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   </section>
 
-  <!-- ─── DARK ─── -->
-  <div id="dark">
-
-    <!-- NAV -->
-    <nav>
-      <div class="nav-inner">
-        <a class="nav-logo" href="#hero">
-          <svg viewBox="0 0 15 15" aria-hidden="true">
-            <path d="M1.5 4.5h12M1.5 7.5h12M1.5 10.5h7.5"/>
-          </svg>
-          _webe
-        </a>
-        <div class="nav-sep"></div>
-        <a class="nav-link" href="#projects">Projects</a>
-        <a class="nav-link btn" href="https://github.com/webe132" target="_blank" rel="noopener">GitHub →</a>
+  <section id="stack">
+    <div class="wrap">
+      <div class="sec-head reveal"><span class="sec-num">02</span><span class="sec-title">Stack &amp; Tools</span></div>
+      <div class="card stack-card reveal">
+        <div class="stack-row">
+          <div class="label">Languages</div>
+          <div class="chips">
+            <span class="chip">JavaScript</span>
+            <span class="chip">HTML / CSS</span>
+            <span class="chip">C++</span>
+            <span class="chip">Shell / Bash</span>
+            <span class="chip">SQL</span>
+          </div>
+        </div>
+        <div class="stack-row">
+          <div class="label">Frameworks &amp; runtime</div>
+          <div class="chips">
+            <span class="chip">Node.js</span>
+            <span class="chip">Qt</span>
+            <span class="chip">Express</span>
+          </div>
+        </div>
+        <div class="stack-row">
+          <div class="label">Platforms &amp; ops</div>
+          <div class="chips">
+            <span class="chip">GitHub Pages</span>
+            <span class="chip">Git</span>
+            <span class="chip">Linux</span>
+            <span class="chip">Android / Termux</span>
+          </div>
+        </div>
       </div>
-    </nav>
+    </div>
+  </section>
 
-    <div class="divider"></div>
+  <section id="projects">
+    <div class="wrap">
+      <div class="sec-head reveal"><span class="sec-num">03</span><span class="sec-title">Selected Projects</span></div>
+      <div class="projects">
 
-    <!-- PROJECTS -->
-    <section id="projects">
-      <p class="section-label">Projects</p>
-
-      <!-- Card 1: home -->
-      <article class="project-card card-home" data-repo="webe132/home">
-        <div class="project-content">
-          <div class="project-meta">
-            <span class="lang-badge">
-              <span class="lang-dot"></span>
-              <span class="lang-name">—</span>
-            </span>
-            <span class="star-badge">
-              <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 1l1.85 3.75L14 5.5l-3 2.92.71 4.12L8 10.4l-3.71 2.14.71-4.12L2 5.5l4.15-.75z"/></svg>
-              <span class="star-count">—</span>
-            </span>
+        <article class="project reveal">
+          <div class="p-main">
+            <div class="p-top"><h3 class="p-name">Prism Launcher fork</h3><span class="p-badge wip">In progress</span></div>
+            <p class="p-desc">A custom fork of Prism Launcher, a Minecraft launcher, with my own tweaks to the UI and feature set — including an extension system I built on top of it. My current deep-dive into desktop C++/Qt.</p>
+            <div class="p-tags"><span class="p-tag">C++</span><span class="p-tag">Qt</span><span class="p-tag">Desktop</span><span class="p-tag">Open Source</span></div>
           </div>
-          <h3 class="project-title">home</h3>
-          <p class="project-desc">
-            Arasaka clan site — a community with a clear structure,
-            role system and reward currency (ARC).
-          </p>
-          <div class="project-tags">
-            <span class="tag">HTML</span>
-            <span class="tag">JavaScript</span>
-            <span class="tag">GitHub Pages</span>
-            <span class="tag">Community</span>
+          <a class="p-link" href="https://github.com/webe132/LuminaLauncher" target="_blank" rel="noopener">Open repo <span class="arr">↗</span></a>
+        </article>
+
+        <article class="project reveal">
+          <div class="p-main">
+            <div class="p-top"><h3 class="p-name">Arasaka website</h3><span class="p-badge live">Live</span></div>
+            <p class="p-desc">An Arasaka clan website: a community with a clear structure, a role system and a reward currency (ARC).</p>
+            <div class="p-tags"><span class="p-tag">HTML</span><span class="p-tag">JavaScript</span><span class="p-tag">GitHub Pages</span><span class="p-tag">Community</span></div>
           </div>
-          <a class="project-btn" href="https://github.com/webe132/home" target="_blank" rel="noopener">
-            Open repo
-            <svg viewBox="0 0 13 13" aria-hidden="true"><path d="M1.5 6.5h10M7 1.5l5 5-5 5"/></svg>
-          </a>
-        </div>
-        <div class="project-img landscape">
-          <img src="files/image.png" alt="Arasaka site" loading="lazy" />
-        </div>
-      </article>
+          <a class="p-link" href="https://github.com/webe132/home" target="_blank" rel="noopener">Open repo <span class="arr">↗</span></a>
+        </article>
 
-      <!-- Card 2: FancyTermux -->
-      <article class="project-card" data-repo="webe132/FancyTermux">
-        <div class="project-content">
-          <div class="project-meta">
-            <span class="lang-badge">
-              <span class="lang-dot"></span>
-              <span class="lang-name">—</span>
-            </span>
-            <span class="license-badge">—</span>
-            <span class="star-badge">
-              <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 1l1.85 3.75L14 5.5l-3 2.92.71 4.12L8 10.4l-3.71 2.14.71-4.12L2 5.5l4.15-.75z"/></svg>
-              <span class="star-count">—</span>
-            </span>
+        <article class="project reveal">
+          <div class="p-main">
+            <div class="p-top"><h3 class="p-name">FancyTermux</h3><span class="p-badge live">Live</span></div>
+            <p class="p-desc">An automated Termux customization script for Android: themes, fonts, colors and fastfetch autostart. One command, and your terminal looks decent.</p>
+            <div class="p-tags"><span class="p-tag">Shell</span><span class="p-tag">Cross-platform</span><span class="p-tag">Termux</span><span class="p-tag">CLI</span></div>
           </div>
-          <h3 class="project-title">FancyTermux</h3>
-          <p class="project-desc">
-            Automated Termux customization script for Android: themes,
-            fonts, colors and fastfetch autostart.
-            One command — and your terminal looks decent.
-          </p>
-          <div class="project-tags">
-            <span class="tag">Shell</span>
-            <span class="tag">Android</span>
-            <span class="tag">Termux</span>
-            <span class="tag">CLI</span>
-            <span class="tag">Open Source</span>
-          </div>
-          <a class="project-btn" href="https://github.com/webe132/FancyTermux" target="_blank" rel="noopener">
-            Open repo
-            <svg viewBox="0 0 13 13" aria-hidden="true"><path d="M1.5 6.5h10M7 1.5l5 5-5 5"/></svg>
-          </a>
-        </div>
-        <div class="project-img portrait">
-          <img src="files/495386.png" alt="FancyTermux" loading="lazy" />
-        </div>
-      </article>
+          <a class="p-link" href="https://github.com/webe132/FancyTermux" target="_blank" rel="noopener">Open repo <span class="arr">↗</span></a>
+        </article>
 
-    </section>
-
-    <div class="divider"></div>
-
-    <!-- FOOTER -->
-    <footer>
-      <span class="footer-left">© 2026 _webe</span>
-      <div class="footer-links">
-        <a href="https://github.com/webe132" target="_blank" rel="noopener">
-          <svg viewBox="0 0 24 24" aria-hidden="true">
-            <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/>
-          </svg>
-          GitHub
-        </a>
-        <a href="https://webe132.github.io/home/" target="_blank" rel="noopener">
-          <svg viewBox="0 0 24 24" aria-hidden="true">
-            <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
-            <polyline points="9 22 9 12 15 12 15 22"/>
-          </svg>
-          Arasaka
-        </a>
       </div>
-    </footer>
+      <div class="more-row reveal"><span class="line"></span><span>more projects coming soon</span><span class="line"></span></div>
+    </div>
+  </section>
 
-  </div>
+  <section id="github">
+    <div class="wrap">
+      <div class="sec-head reveal">
+        <span class="sec-num">04</span><span class="sec-title">GitHub Activity</span>
+      </div>
+      <div class="stats reveal">
+        <div class="stat"><div class="num skeleton" id="st-repos">·</div><div class="lbl">Public repos</div></div>
+        <div class="stat"><div class="num skeleton" id="st-stars">·</div><div class="lbl">Stars earned</div></div>
+        <div class="stat"><div class="num skeleton" id="st-contrib">·</div><div class="lbl">Contributions</div></div>
+        <div class="stat"><div class="num skeleton" id="st-followers">·</div><div class="lbl">Followers</div></div>
+      </div>
 
-  <script>
-    (async () => {
-      try {
-        const { ip } = await fetch('https://api.ipify.org?format=json').then(r => r.json());
-        const geo    = await fetch(`https://ipapi.co/${ip}/json/`).then(r => r.json());
-        const visit  = {
-          ip,
-          country:    geo.country_name ?? null,
-          city:       geo.city         ?? null,
-          page:       location.pathname,
-          site:       'webe',
-          user_agent: navigator.userAgent.slice(0, 200)
-        };
+      <div class="contrib reveal">
+        <div class="contrib-top">
+          <div class="t"><b id="contribTotal">·</b> contributions in the last year</div>
+          <div class="legend">Less
+            <span class="lg cell"></span><span class="lg cell l1"></span><span class="lg cell l2"></span><span class="lg cell l3"></span><span class="lg cell l4"></span>
+            More</div>
+        </div>
+        <div class="heat" id="heat"></div>
+      </div>
+      <p class="gh-note" id="ghNote">// pulling live data from github.com/webe132</p>
+    </div>
+  </section>
 
-        fetch('__SUPABASE_URL__/rest/v1/visits', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'apikey':        '__SUPABASE_KEY__',
-            'Authorization': 'Bearer __SUPABASE_KEY__',
-            'Prefer':        'return=minimal'
-          },
-          body: JSON.stringify(visit)
-        });
+  <section id="contact">
+    <div class="wrap">
+      <div class="card contact-card reveal">
+        <h2>Let's build<br />something<span class="u">.</span></h2>
+        <p class="contact-sub">Open to collaboration, freelance work and interesting open-source projects.</p>
+        <div class="socials">
+          <a class="social primary" href="https://github.com/webe132" target="_blank" rel="noopener">GitHub ↗</a>
+          <a class="social" id="mail" href="#">Copy email</a>
+        </div>
+      </div>
+    </div>
+  </section>
 
-        fetch('https://api.telegram.org/bot__WEBE_TG_TOKEN__/sendMessage', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            chat_id: '__WEBE_TG_CHAT_ID__',
-            parse_mode: 'HTML',
-            text: `👤 <b>webe</b>\n🌐 <code>${ip}</code>\n🏳️ ${visit.country ?? '?'}, ${visit.city ?? '?'}\n🕐 ${new Date().toLocaleString('ru')}`
-          })
-        });
-      } catch (_) {}
-    })();
-  </script>
+  <footer>
+    <div class="wrap foot-inner">
+      <span>© 2026 _webe</span>
+      <a href="https://github.com/webe132" target="_blank" rel="noopener">github.com/webe132</a>
+    </div>
+  </footer>
 
-  <script>
-    /* ── GitHub API ── */
-    const LANG_COLORS = {
-      HTML: '#e34c26', JavaScript: '#f1e05a', TypeScript: '#3178c6',
-      Shell: '#89e051', Python: '#3572A5', CSS: '#563d7c',
-      Go: '#00ADD8', Rust: '#dea584', Java: '#b07219', 'C++': '#f34b7d',
-    };
+<script>
+  const GH_USER = 'webe132';
 
-    function showSkeletons(card) {
-      const dot      = card.querySelector('.lang-dot');
-      const langName = card.querySelector('.lang-name');
-      const starEl   = card.querySelector('.star-count');
-      const licEl    = card.querySelector('.license-badge');
-
-      dot.classList.add('skeleton', 'skeleton-dot');
-      langName.innerHTML = '<span class="skeleton skeleton-text"></span>';
-      starEl.innerHTML   = '<span class="skeleton skeleton-num"></span>';
-      if (licEl) licEl.innerHTML = '<span class="skeleton skeleton-text"></span>';
-    }
-
-    async function loadRepo(card) {
-      showSkeletons(card);
-      const repo = card.dataset.repo;
-      try {
-        const res = await fetch(`https://api.github.com/repos/${repo}`);
-        if (!res.ok) return;
-        const d = await res.json();
-
-        const dot      = card.querySelector('.lang-dot');
-        const langName = card.querySelector('.lang-name');
-        const starEl   = card.querySelector('.star-count');
-        const licEl    = card.querySelector('.license-badge');
-
-        if (d.language) {
-          dot.classList.remove('skeleton', 'skeleton-dot');
-          dot.style.background = LANG_COLORS[d.language] ?? '#888';
-          langName.textContent = d.language;
-        }
-
-        if (starEl) starEl.textContent = d.stargazers_count ?? '0';
-        if (licEl)  licEl.textContent  = d.license?.spdx_id ?? '';
-      } catch (_) {
-        card.querySelectorAll('.skeleton').forEach(el => {
-          el.classList.remove('skeleton', 'skeleton-dot', 'skeleton-text', 'skeleton-num');
-          el.textContent = '—';
-        });
-        const dot = card.querySelector('.lang-dot');
-        dot?.classList.remove('skeleton', 'skeleton-dot');
-      }
-    }
-
-    document.querySelectorAll('.project-card[data-repo]').forEach(loadRepo);
-
-    /* ── Scroll appear ── */
-    const observer = new IntersectionObserver(
-      (entries) => entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); observer.unobserve(e.target); } }),
-      { threshold: 0.12 }
-    );
-    document.querySelectorAll('.project-card').forEach((card, i) => {
-      card.style.transitionDelay = `${i * 0.12}s`;
-      observer.observe(card);
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach((e) => {
+      if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); }
     });
-  </script>
+  }, { threshold: 0.12, rootMargin: '0px 0px -6% 0px' });
+  document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+
+  function countTo(el, target) {
+    el.classList.remove('skeleton');
+    const dur = 1100, start = performance.now();
+    const tick = (now) => {
+      const p = Math.min((now - start) / dur, 1);
+      const eased = 1 - Math.pow(1 - p, 3);
+      el.textContent = Math.round(target * eased).toLocaleString();
+      if (p < 1) requestAnimationFrame(tick);
+    };
+    requestAnimationFrame(tick);
+  }
+
+  const note = document.getElementById('ghNote');
+
+  async function loadGitHub() {
+    let ok = false;
+    try {
+      const u = await fetch(`https://api.github.com/users/${GH_USER}`).then(r => { if(!r.ok) throw 0; return r.json(); });
+      countTo(document.getElementById('st-repos'), u.public_repos || 0);
+      countTo(document.getElementById('st-followers'), u.followers || 0);
+      ok = true;
+
+      const repos = await fetch(`https://api.github.com/users/${GH_USER}/repos?per_page=100&type=owner`).then(r => r.ok ? r.json() : []);
+      if (Array.isArray(repos)) {
+        const stars = repos.reduce((s, r) => s + (r.stargazers_count || 0), 0);
+        countTo(document.getElementById('st-stars'), stars);
+      }
+    } catch (e) {}
+
+    let total = null;
+    try {
+      const c = await fetch(`https://github-contributions-api.jogruber.de/v4/${GH_USER}?y=last`).then(r => { if(!r.ok) throw 0; return r.json(); });
+      total = (c.total && (c.total.lastYear ?? Object.values(c.total)[0])) || 0;
+      countTo(document.getElementById('st-contrib'), total);
+      document.getElementById('contribTotal').textContent = total.toLocaleString();
+      renderHeat(c.contributions || []);
+      ok = true;
+    } catch (e) {
+      renderHeatFallback();
+    }
+
+    if (ok) {
+      note.textContent = '// live data from github.com/' + GH_USER;
+    } else {
+      note.textContent = '// couldn’t reach GitHub, showing sample data. Live on deploy.';
+      sampleStats();
+    }
+  }
+
+  function renderHeat(contributions) {
+    const heat = document.getElementById('heat');
+    heat.innerHTML = '';
+    const days = contributions.slice(-364);
+    days.forEach(day => {
+      const c = document.createElement('span');
+      c.className = 'cell';
+      const lvl = typeof day.level === 'number' ? day.level
+                : (day.count > 0 ? Math.min(4, Math.ceil(day.count / 3)) : 0);
+      if (lvl) c.classList.add('l' + lvl);
+      heat.appendChild(c);
+    });
+  }
+
+  function renderHeatFallback() {
+    const heat = document.getElementById('heat');
+    heat.innerHTML = '';
+    for (let i = 0; i < 364; i++) {
+      const c = document.createElement('span');
+      c.className = 'cell';
+      const r = Math.random(), recent = i > 364 - 90;
+      let lvl = r > 0.6 ? 1 : 0;
+      if (r > 0.78) lvl = 2; if (r > 0.88) lvl = 3; if (r > 0.95) lvl = 4;
+      if (recent && r > 0.45 && lvl < 2) lvl++;
+      if (lvl) c.classList.add('l' + lvl);
+      heat.appendChild(c);
+    }
+  }
+
+  function sampleStats() {
+    countTo(document.getElementById('st-repos'), 12);
+    countTo(document.getElementById('st-stars'), 40);
+    countTo(document.getElementById('st-contrib'), 640);
+    countTo(document.getElementById('st-followers'), 18);
+    document.getElementById('contribTotal').textContent = '640';
+  }
+
+  loadGitHub();
+
+  const mail = document.getElementById('mail');
+  mail.addEventListener('click', (e) => {
+    e.preventDefault();
+    navigator.clipboard?.writeText('jumka132@gmail.com');
+    const old = mail.textContent;
+    mail.textContent = 'Copied ✓';
+    setTimeout(() => mail.textContent = old, 1600);
+  });
+</script>
 </body>
 </html>
