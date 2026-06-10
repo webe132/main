@@ -9,8 +9,8 @@
   :root {
     --bg: #050506;
     --bg-2: #0c0c0e;
-    --card: rgba(255,255,255,0.035);
-    --card-hover: rgba(255,255,255,0.06);
+    --card: rgba(255,255,255,0.06);
+    --card-hover: rgba(255,255,255,0.1);
     --border: rgba(255,255,255,0.09);
     --border-strong: rgba(255,255,255,0.18);
     --text: #f5f5f7;
@@ -50,6 +50,33 @@
       radial-gradient(600px 600px at 88% 12%, rgba(255,255,255,0.03), transparent 66%);
   }
 
+  .edge-blur { position: fixed; left: 0; right: 0; z-index: 40; pointer-events: none; height: 120px; transition: opacity 0.3s var(--ease); }
+  .edge-blur.top { top: 0; --to: to bottom; }
+  .edge-blur.bottom { bottom: 0; --to: to top; }
+  .edge-blur > span { position: absolute; inset: 0; display: block; }
+  /* progressive blur: each deeper layer blurs harder but is masked to a band closer to the edge,
+     overlapping fades so the strength ramps smoothly instead of stepping */
+  .edge-blur > span:nth-child(1) {
+    backdrop-filter: blur(1.5px); -webkit-backdrop-filter: blur(1.5px);
+    -webkit-mask-image: linear-gradient(var(--to), #000 0%, #000 50%, transparent 100%);
+    mask-image: linear-gradient(var(--to), #000 0%, #000 50%, transparent 100%);
+  }
+  .edge-blur > span:nth-child(2) {
+    backdrop-filter: blur(3px); -webkit-backdrop-filter: blur(3px);
+    -webkit-mask-image: linear-gradient(var(--to), #000 0%, #000 30%, transparent 65%);
+    mask-image: linear-gradient(var(--to), #000 0%, #000 30%, transparent 65%);
+  }
+  .edge-blur > span:nth-child(3) {
+    backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
+    -webkit-mask-image: linear-gradient(var(--to), #000 0%, #000 14%, transparent 46%);
+    mask-image: linear-gradient(var(--to), #000 0%, #000 14%, transparent 46%);
+  }
+  .edge-blur > span:nth-child(4) {
+    backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+    -webkit-mask-image: linear-gradient(var(--to), #000 0%, transparent 28%);
+    mask-image: linear-gradient(var(--to), #000 0%, transparent 28%);
+  }
+
   nav {
     position: fixed; top: 16px; left: 50%; transform: translateX(-50%);
     z-index: 50; width: calc(100% - 32px); max-width: 940px;
@@ -57,10 +84,9 @@
   .nav-inner {
     display: flex; align-items: center; justify-content: space-between;
     height: 54px; padding: 0 10px 0 20px;
-    background: rgba(20,20,22,0.6);
+    background: rgba(34,34,38,0.72);
     backdrop-filter: blur(20px) saturate(160%);
     -webkit-backdrop-filter: blur(20px) saturate(160%);
-    border: 1px solid var(--border);
     border-radius: 980px;
     box-shadow: 0 8px 30px -12px rgba(0,0,0,0.6);
   }
@@ -76,15 +102,28 @@
   .nav-links a.cta:hover { background: var(--text-dim); }
   @media (max-width: 640px) { .nav-links a.hide-sm { display: none; } }
 
-  .reveal { opacity: 0; transform: translateY(20px); transition: opacity 0.8s var(--ease), transform 0.8s var(--ease); }
-  .reveal.in { opacity: 1; transform: none; }
+  .reveal { opacity: 0; }
+  .reveal.in {
+    animation: cardIn 0.8s var(--ease) both;
+    animation-delay: var(--rd, 0s);
+    will-change: transform, opacity, filter;
+  }
+  @keyframes cardIn {
+    from { opacity: 0; transform: translateY(46px) scale(0.93); filter: blur(9px); }
+    60%  { filter: blur(0); }
+    to   { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .reveal { opacity: 1; }
+    .reveal.in { animation: none; }
+  }
 
   header.hero { position: relative; z-index: 1; padding: 180px 0 110px; text-align: center; }
   .pill-tag {
     display: inline-flex; align-items: center; gap: 8px;
     font-size: 13px; color: var(--text-dim);
-    border: 1px solid var(--border); border-radius: 980px; padding: 7px 15px;
-    background: var(--card); margin-bottom: 32px;
+    border-radius: 980px; padding: 7px 15px;
+    background: rgba(255,255,255,0.07); margin-bottom: 32px;
   }
   .pill-tag .live { width: 7px; height: 7px; border-radius: 50%; background: var(--white); box-shadow: 0 0 8px rgba(255,255,255,0.6); }
   .hero h1 {
@@ -104,21 +143,20 @@
   }
   .btn-primary { background: var(--white); color: #000; }
   .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 14px 36px -12px rgba(255,255,255,0.4); }
-  .btn-ghost { border: 1px solid var(--border-strong); color: var(--text); background: var(--card); }
+  .btn-ghost { color: var(--text); background: rgba(255,255,255,0.09); }
   .btn-ghost:hover { background: var(--card-hover); transform: translateY(-2px); }
   .btn .arr { transition: transform 0.3s var(--ease); }
   .btn:hover .arr { transform: translateX(3px); }
 
   section { position: relative; z-index: 1; padding: 70px 0; }
   .sec-head { display: flex; align-items: center; gap: 14px; margin-bottom: 40px; }
-  .sec-num { font-family: var(--mono); font-size: 12px; color: var(--text-mute); border: 1px solid var(--border); border-radius: 980px; padding: 4px 11px; }
+  .sec-num { font-family: var(--mono); font-size: 12px; color: var(--text-mute); background: rgba(255,255,255,0.055); border-radius: 980px; padding: 4px 11px; }
   .sec-title { font-size: 15px; color: var(--text-dim); letter-spacing: 0.02em; font-weight: 500; }
 
   .label { font-size: 12px; color: var(--text-mute); letter-spacing: 0.06em; text-transform: uppercase; margin-bottom: 14px; font-weight: 500; }
 
   .card {
-    background: var(--card); border: 1px solid var(--border); border-radius: var(--r-md);
-    background-image: linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0));
+    background: var(--card); border-radius: var(--r-md);
   }
 
   .about-grid { display: grid; grid-template-columns: 1.15fr 0.85fr; gap: 20px; align-items: stretch; }
@@ -132,11 +170,11 @@
   .chips { display: flex; flex-wrap: wrap; gap: 9px; }
   .chip {
     font-size: 13.5px; color: var(--text-dim);
-    border: 1px solid var(--border); border-radius: 980px; padding: 8px 15px;
-    transition: all 0.26s var(--ease); cursor: default; background: rgba(255,255,255,0.02);
+    border-radius: 980px; padding: 8px 15px;
+    transition: all 0.26s var(--ease); cursor: default; background: rgba(255,255,255,0.06);
   }
-  .chip:hover { color: var(--text); border-color: var(--border-strong); transform: translateY(-2px); }
-  .chip.key { color: #000; background: var(--white); border-color: var(--white); }
+  .chip:hover { color: var(--text); background: rgba(255,255,255,0.11); transform: translateY(-2px); }
+  .chip.key { color: #000; background: var(--white); }
 
   .stack-card { padding: 38px 36px; display: flex; flex-direction: column; gap: 26px; }
   .stack-row .label { margin-bottom: 12px; }
@@ -145,26 +183,26 @@
   .project {
     display: grid; grid-template-columns: 1fr auto; gap: 24px; align-items: center;
     padding: 30px 32px; border-radius: var(--r-md);
-    background: var(--card); border: 1px solid var(--border);
-    transition: transform 0.4s var(--ease), border-color 0.4s var(--ease), background-color 0.4s var(--ease);
+    background: var(--card);
+    transition: transform 0.4s var(--ease), background-color 0.4s var(--ease);
   }
-  .project:hover { transform: translateY(-4px); border-color: var(--border-strong); background-color: var(--card-hover); }
+  .project:hover { transform: translateY(-4px); background-color: var(--card-hover); }
   .p-main { min-width: 0; }
   .p-top { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 9px; }
   .p-name { font-size: 27px; font-weight: 600; letter-spacing: -0.02em; }
   .p-badge { font-size: 11.5px; padding: 4px 11px; border-radius: 980px; letter-spacing: 0.02em; font-weight: 500; }
-  .p-badge.wip { color: var(--text); background: rgba(255,255,255,0.1); border: 1px solid var(--border); }
+  .p-badge.wip { color: var(--text); background: rgba(255,255,255,0.13); }
   .p-badge.live { color: #34d399; background: rgba(52,211,153,0.12); }
   .p-desc { color: var(--text-dim); font-size: 16px; line-height: 1.5; max-width: 580px; }
   .p-tags { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 16px; }
-  .p-tag { font-family: var(--mono); font-size: 11.5px; color: var(--text-mute); border: 1px solid var(--border); border-radius: 7px; padding: 3px 9px; }
+  .p-tag { font-family: var(--mono); font-size: 11.5px; color: var(--text-mute); background: rgba(255,255,255,0.05); border-radius: 7px; padding: 3px 9px; }
   .p-link {
     font-size: 14px; color: var(--text); white-space: nowrap;
     display: inline-flex; align-items: center; gap: 8px;
-    border: 1px solid var(--border-strong); border-radius: 980px; padding: 11px 20px;
-    transition: all 0.28s var(--ease); background: var(--card);
+    border-radius: 980px; padding: 11px 20px;
+    transition: all 0.28s var(--ease); background: rgba(255,255,255,0.09);
   }
-  .p-link:hover { background: var(--white); color: #000; border-color: var(--white); }
+  .p-link:hover { background: var(--white); color: #000; }
   .p-link .arr { transition: transform 0.28s var(--ease); }
   .p-link:hover .arr { transform: translate(2px,-2px); }
   @media (max-width: 680px) { .project { grid-template-columns: 1fr; } .p-link { justify-self: start; } }
@@ -177,12 +215,12 @@
   .gh-live.on .d { background: #34d399; box-shadow: 0 0 8px #34d399; }
   .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
   @media (max-width: 680px) { .stats { grid-template-columns: repeat(2, 1fr); } }
-  .stat { padding: 30px 26px; border-radius: var(--r-md); background: var(--card); border: 1px solid var(--border); background-image: linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0)); transition: transform 0.35s var(--ease), border-color 0.35s; }
-  .stat:hover { transform: translateY(-3px); border-color: var(--border-strong); }
+  .stat { padding: 30px 26px; border-radius: var(--r-md); background: var(--card); transition: transform 0.35s var(--ease), background-color 0.35s; }
+  .stat:hover { transform: translateY(-3px); background-color: var(--card-hover); }
   .stat .num { font-size: 48px; font-weight: 600; letter-spacing: -0.03em; line-height: 1; font-variant-numeric: tabular-nums; }
   .stat .num.skeleton { color: var(--text-mute); }
   .stat .lbl { font-size: 13px; color: var(--text-mute); margin-top: 12px; }
-  .contrib { margin-top: 16px; padding: 28px 30px; border-radius: var(--r-md); background: var(--card); border: 1px solid var(--border); background-image: linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0)); }
+  .contrib { margin-top: 16px; padding: 28px 30px; border-radius: var(--r-md); background: var(--card); }
   .contrib-top { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 20px; flex-wrap: wrap; }
   .contrib-top .t { font-size: 14px; color: var(--text-dim); }
   .contrib-top .t b { color: var(--text); font-weight: 600; }
@@ -206,9 +244,9 @@
   .contact-card h2 .u { color: var(--text-mute); }
   .contact-sub { color: var(--text-dim); font-size: 19px; max-width: 480px; margin: 0 auto 34px; }
   .socials { display: flex; flex-wrap: wrap; gap: 12px; justify-content: center; }
-  .social { font-size: 14px; color: var(--text); border: 1px solid var(--border-strong); border-radius: 980px; padding: 12px 22px; display: inline-flex; align-items: center; gap: 8px; transition: all 0.28s var(--ease); background: var(--card); }
-  .social:hover { background: var(--white); color: #000; border-color: var(--white); transform: translateY(-2px); }
-  .social.primary { background: var(--white); color: #000; border-color: var(--white); }
+  .social { font-size: 14px; color: var(--text); border-radius: 980px; padding: 12px 22px; display: inline-flex; align-items: center; gap: 8px; transition: all 0.28s var(--ease); background: rgba(255,255,255,0.09); }
+  .social:hover { background: var(--white); color: #000; transform: translateY(-2px); }
+  .social.primary { background: var(--white); color: #000; }
   .social.primary:hover { background: var(--text-dim); }
 
   footer { position: relative; z-index: 1; margin-top: 70px; padding: 32px 0 40px; }
@@ -219,6 +257,8 @@
 </head>
 <body>
   <div class="ambient"></div>
+  <div class="edge-blur top"><span></span><span></span><span></span><span></span></div>
+  <div class="edge-blur bottom"><span></span><span></span><span></span><span></span></div>
 
   <nav>
     <div class="nav-inner">
@@ -354,11 +394,11 @@
       <div class="sec-head reveal">
         <span class="sec-num">04</span><span class="sec-title">GitHub Activity</span>
       </div>
-      <div class="stats reveal">
-        <div class="stat"><div class="num skeleton" id="st-repos">·</div><div class="lbl">Public repos</div></div>
-        <div class="stat"><div class="num skeleton" id="st-stars">·</div><div class="lbl">Stars earned</div></div>
-        <div class="stat"><div class="num skeleton" id="st-contrib">·</div><div class="lbl">Contributions</div></div>
-        <div class="stat"><div class="num skeleton" id="st-followers">·</div><div class="lbl">Followers</div></div>
+      <div class="stats">
+        <div class="stat reveal"><div class="num skeleton" id="st-repos">·</div><div class="lbl">Public repos</div></div>
+        <div class="stat reveal"><div class="num skeleton" id="st-stars">·</div><div class="lbl">Stars earned</div></div>
+        <div class="stat reveal"><div class="num skeleton" id="st-contrib">·</div><div class="lbl">Contributions</div></div>
+        <div class="stat reveal"><div class="num skeleton" id="st-followers">·</div><div class="lbl">Followers</div></div>
       </div>
 
       <div class="contrib reveal">
@@ -381,7 +421,7 @@
         <p class="contact-sub">Open to collaboration, freelance work and interesting open-source projects.</p>
         <div class="socials">
           <a class="social primary" href="https://github.com/webe132" target="_blank" rel="noopener">GitHub ↗</a>
-          <a class="social" id="mail" href="#">Copy email</a>
+          <a class="social" id="mail" href="#">Telegram @webe132</a>
         </div>
       </div>
     </div>
@@ -402,7 +442,20 @@
       if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); }
     });
   }, { threshold: 0.12, rootMargin: '0px 0px -6% 0px' });
-  document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+  document.querySelectorAll('.reveal').forEach(el => {
+    // stagger siblings so stacked cards cascade in one after another
+    const sibs = [...el.parentElement.children].filter(c => c.classList.contains('reveal'));
+    const i = sibs.indexOf(el);
+    if (i > 0) el.style.setProperty('--rd', (i * 0.08) + 's');
+    // once the entrance finishes, drop the reveal state so hover transforms behave normally
+    el.addEventListener('animationend', () => {
+      el.classList.remove('reveal', 'in');
+      el.style.opacity = '';
+      el.style.animation = '';
+      el.style.willChange = '';
+    }, { once: true });
+    io.observe(el);
+  });
 
   function countTo(el, target) {
     el.classList.remove('skeleton');
@@ -492,10 +545,21 @@
 
   loadGitHub();
 
+  // ease off the bottom blur near the end of the page so the footer reads clearly
+  const bottomBlur = document.querySelector('.edge-blur.bottom');
+  function updateBottomBlur() {
+    const remaining = document.documentElement.scrollHeight - (window.scrollY + window.innerHeight);
+    const fade = Math.max(0, Math.min(1, remaining / 200)); // 0 at the very bottom → 1 once 200px away
+    bottomBlur.style.opacity = (0.1 + 0.9 * fade).toFixed(3);
+  }
+  window.addEventListener('scroll', updateBottomBlur, { passive: true });
+  window.addEventListener('resize', updateBottomBlur);
+  updateBottomBlur();
+
   const mail = document.getElementById('mail');
   mail.addEventListener('click', (e) => {
     e.preventDefault();
-    navigator.clipboard?.writeText('jumka132@gmail.com');
+    navigator.clipboard?.writeText('@webe132');
     const old = mail.textContent;
     mail.textContent = 'Copied ✓';
     setTimeout(() => mail.textContent = old, 1600);
